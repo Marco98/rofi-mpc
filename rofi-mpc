@@ -1,0 +1,47 @@
+#!/usr/bin/env python
+from subprocess import Popen, PIPE, STDOUT, check_output, check_call
+
+current = check_output(["mpc", "current"]).decode()
+if not current:
+	current = "Nothing is currently Playing"
+else:
+	current = "Currently Playing: "+current.rstrip()
+commands = b"List\nPlay/Pause\nNext\nPrev\nVolume 25%\nVolume 35%\nVolume 50%\nVolume 75%\nVolume 100%"
+rofi = Popen(["rofi", "-selected-row", "1", "-mesg", current, "-i", "-dmenu", "-p", "MPC: "], stdout=PIPE, stdin=PIPE)
+tmp = rofi.communicate(input=commands)[0].decode().rstrip()
+if tmp == "Play/Pause":
+	check_call(["mpc", "toggle"])
+if tmp == "Next":
+	check_call(["mpc", "next"])
+if tmp == "Prev":
+	check_call(["mpc", "prev"])
+if tmp == "Volume 25%":
+	check_call(["mpc", "volume", "25"])
+if tmp == "Volume 35%":
+	check_call(["mpc", "volume", "35"])
+if tmp == "Volume 50%":
+	check_call(["mpc", "volume", "50"])
+if tmp == "Volume 75%":
+	check_call(["mpc", "volume", "75"])
+if tmp == "Volume 100%":
+	check_call(["mpc", "volume", "100"])
+if tmp == "List":
+	titles = Popen(["mpc", "playlist"], stdout=PIPE)
+	titles = titles.communicate()[0].rstrip()
+	track = 1
+	tlist = ""
+	for line in titles.splitlines():
+		tlist = tlist + "[" + str(track) + "] " + line.decode() + "\n"
+		track += 1
+	tlist.rstrip()
+	tlist = "[Reload DB]\n" + tlist
+	rofi = Popen(["rofi", "-selected-row", "1", "-i", "-dmenu", "-p", "Play: "], stdout=PIPE, stdin=PIPE)
+	tmp = rofi.communicate(input=tlist.encode())[0].decode().rstrip()
+	tmp = tmp[tmp.find("[")+1:tmp.find("]")]
+	if tmp == "Reload DB":
+		Popen(["mpc", "clear"])
+		ls = Popen(["mpc", "ls"], stdout=PIPE)
+		add = Popen(["mpc", "add"], stdin=PIPE)
+		add.communicate(input=ls.communicate()[0])
+	else:
+		Popen(["mpc", "play", tmp])
