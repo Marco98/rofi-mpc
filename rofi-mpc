@@ -1,7 +1,11 @@
 #!/usr/bin/env python
 from subprocess import Popen, PIPE, STDOUT, check_output, check_call
+from pathlib import Path
+import sys
+def getCurrent():
+	return check_output(["mpc", "current"]);
 
-current = check_output(["mpc", "current"]).decode()
+current = getCurrent().decode()
 if not current:
 	current = "Nothing is currently Playing"
 else:
@@ -26,22 +30,41 @@ if tmp == "Volume 75%":
 if tmp == "Volume 100%":
 	check_call(["mpc", "volume", "100"])
 if tmp == "List":
-	titles = Popen(["mpc", "playlist"], stdout=PIPE)
-	titles = titles.communicate()[0].rstrip()
-	track = 1
+	titles = check_output(["mpc", "playlist"])
+	track = 0
 	tlist = ""
 	for line in titles.splitlines():
-		tlist = tlist + "[" + str(track) + "] " + line.decode() + "\n"
 		track += 1
-	tlist.rstrip()
-	tlist = "[Reload DB]\n" + tlist
-	rofi = Popen(["rofi", "-selected-row", "1", "-i", "-dmenu", "-p", "Play: "], stdout=PIPE, stdin=PIPE)
-	tmp = rofi.communicate(input=tlist.encode())[0].decode().rstrip()
-	tmp = tmp[tmp.find("[")+1:tmp.find("]")]
-	if tmp == "Reload DB":
-		Popen(["mpc", "clear"])
-		ls = Popen(["mpc", "ls"], stdout=PIPE)
-		add = Popen(["mpc", "add"], stdin=PIPE)
-		add.communicate(input=ls.communicate()[0])
+		tlist = tlist + "[" + str(track) + "] " + line.decode() + "\n"
+	if track > 1:
+		tlist.rstrip()
+		tlist = "[SOURCES]\n" + tlist
+		rofi = Popen(["rofi", "-selected-row", "1", "-i", "-dmenu", "-p", "Play: "], stdout=PIPE, stdin=PIPE)
+		tmp = rofi.communicate(input=tlist.encode())[0].decode().rstrip()
+		tmp = tmp[tmp.find("[")+1:tmp.find("]")]
 	else:
-		Popen(["mpc", "play", tmp])
+		tmp = "SOURCES"
+	if not tmp:
+		sys.exit(0)
+	if tmp == "SOURCES":
+		commands = "Local ~/Music\n"
+		playlists = check_output(["mpc", "lsplaylists"])
+		for line in playlists.splitlines():
+			commands = commands + line.decode() + "\n"
+		rofi = Popen(["rofi", "-mesg", current, "-i", "-dmenu", "-p", "Select Source: "], stdout=PIPE, stdin=PIPE)
+		tmp = rofi.communicate(input=commands.encode())[0].decode().rstrip()
+		if not tmp:
+			sys.exit(0)
+		#elif tmp == "*Add Stream URL*":	
+		elif tmp == "Local ~/Music":
+			check_call(["mpc", "clear"])
+			ls = check_output(["ls", str(Path.home()) + "/Music"])
+			add = Popen(["mpc", "add"], stdin=PIPE)
+			add.communicate(input=ls)
+			Popen(["mpc", "play"])
+		else:
+			check_call(["mpc", "clear"])
+			check_call(["mpc", "load", tmp])
+			check_call(["mpc", "play"])
+	else:
+		check_call(["mpc", "play", tmp])
