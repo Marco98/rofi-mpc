@@ -47,7 +47,7 @@ if tmp == "List":
 	if not tmp:
 		sys.exit(0)
 	if tmp == "SOURCES":
-		commands = "Local ~/Music\n"
+		commands = "Local Music\n"
 		playlists = check_output(["mpc", "lsplaylists"])
 		for line in playlists.splitlines():
 			commands = commands + line.decode() + "\n"
@@ -56,9 +56,11 @@ if tmp == "List":
 		if not tmp:
 			sys.exit(0)
 		#elif tmp == "*Add Stream URL*":	
-		elif tmp == "Local ~/Music":
+		elif tmp == "Local Music":
 			check_call(["mpc", "clear"])
-			ls = check_output(["ls", str(Path.home()) + "/Music"])
+			musicdir = check_output(["xdg-user-dir", "MUSIC"])
+			musicdir = musicdir.decode().rstrip()
+				ls = check_output(["ls", musicdir])
 			add = Popen(["mpc", "add"], stdin=PIPE)
 			add.communicate(input=ls)
 			Popen(["mpc", "play"])
