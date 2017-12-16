@@ -58,9 +58,10 @@ if tmp == "List":
 		#elif tmp == "*Add Stream URL*":	
 		elif tmp == "Local Music":
 			check_call(["mpc", "clear"])
+			check_call(["mpc", "update"])
 			musicdir = check_output(["xdg-user-dir", "MUSIC"])
 			musicdir = musicdir.decode().rstrip()
-				ls = check_output(["ls", musicdir])
+			ls = check_output(["ls", musicdir])
 			add = Popen(["mpc", "add"], stdin=PIPE)
 			add.communicate(input=ls)
 			Popen(["mpc", "play"])
