@@ -10,7 +10,7 @@ if not current:
 	current = "Nothing is currently Playing"
 else:
 	current = "Currently Playing: "+current.rstrip()
-commands = b"List\nPlay/Pause\nNext\nPrev\nVolume 25%\nVolume 35%\nVolume 50%\nVolume 75%\nVolume 100%"
+commands = b"List\nPlay/Pause\nNext\nPrev\nRandom\nVolume 25%\nVolume 35%\nVolume 50%\nVolume 75%\nVolume 100%"
 rofi = Popen(["rofi", "-selected-row", "1", "-mesg", current, "-i", "-dmenu", "-p", "MPC: "], stdout=PIPE, stdin=PIPE)
 tmp = rofi.communicate(input=commands)[0].decode().rstrip()
 if tmp == "Play/Pause":
@@ -19,6 +19,8 @@ if tmp == "Next":
 	check_call(["mpc", "next"])
 if tmp == "Prev":
 	check_call(["mpc", "prev"])
+if tmp == "Random":
+	check_call(["mpc", "random"])
 if tmp == "Volume 25%":
 	check_call(["mpc", "volume", "25"])
 if tmp == "Volume 35%":
