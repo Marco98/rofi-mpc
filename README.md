@@ -1,5 +1,6 @@
 # rofi-mpc
-Fast graphical Rofi-Interface for contolling MPD
+Fast graphical Rofi-Interface for contolling MPD  
+now in the AUR! *aur/rofi-mpc*
 ## Features
 #### Current list of features:
 * Volume Control
