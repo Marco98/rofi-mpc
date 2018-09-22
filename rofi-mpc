@@ -1,6 +1,8 @@
 #!/usr/bin/env python
 from subprocess import Popen, PIPE, STDOUT, check_output, check_call
 from pathlib import Path
+from os import listdir
+from os.path import isfile, join
 import sys
 def getCurrent():
 	return check_output(["mpc", "current"]);
@@ -56,13 +58,13 @@ if tmp == "List":
 		rofi = Popen(["rofi", "-mesg", current, "-i", "-dmenu", "-p", "Select Source: "], stdout=PIPE, stdin=PIPE)
 		tmp = rofi.communicate(input=commands.encode())[0].decode().rstrip()
 		if not tmp:
-			sys.exit(0)
-		#elif tmp == "*Add Stream URL*":	
+			sys.exit(0)	
 		elif tmp == "Local ~/Music":
 			check_call(["mpc", "clear"])
-			ls = check_output(["ls", str(Path.home()) + "/Music"])
+			mpath = str(Path.home()) + "/Music"
+			files = [f for f in listdir(mpath) if isfile(join(mpath, f)) and not f.startswith(".")]
 			add = Popen(["mpc", "add"], stdin=PIPE)
-			add.communicate(input=ls)
+			add.communicate("\n".join(files).encode())
 			Popen(["mpc", "play"])
 		else:
 			check_call(["mpc", "clear"])
