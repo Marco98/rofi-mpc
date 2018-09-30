@@ -61,10 +61,10 @@ if tmp == "List":
 			sys.exit(0)	
 		elif tmp == "Local ~/Music":
 			check_call(["mpc", "clear"])
-			mpath = str(Path.home()) + "/Music"
-			files = [f for f in listdir(mpath) if isfile(join(mpath, f)) and not f.startswith(".")]
+			check_call(["mpc", "update"])
+			files = check_output(["mpc", "listall"])
 			add = Popen(["mpc", "add"], stdin=PIPE)
-			add.communicate("\n".join(files).encode())
+			add.communicate(files)
 			Popen(["mpc", "play"])
 		else:
 			check_call(["mpc", "clear"])
