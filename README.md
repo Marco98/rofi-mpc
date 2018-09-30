@@ -28,12 +28,12 @@ Recommended **~/.config/mpd/mpd.conf**:
 ```
 db_file				"~/.config/mpd/database"
 log_file			"~/.config/mpd/log"
-restore_paused		"yes"
-music_directory		"~/Music"
-playlist_directory	"~/.config/mpd/playlists"
+restore_paused			"yes"
+music_directory			"~/Music"
+playlist_directory		"~/.config/mpd/playlists"
 pid_file			"~/.config/mpd/pid"
 state_file			"~/.config/mpd/state"
-sticker_file		"~/.config/mpd/sticker.sql"
+sticker_file			"~/.config/mpd/sticker.sql"
 ```
 Start mpd on boot or at xinit like this:
 ```
