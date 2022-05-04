@@ -1,5 +1,5 @@
 # rofi-mpc
-Fast graphical Rofi-Interface for contolling MPD
+Fast graphical Rofi-Interface for controlling MPD
 ## Features
 #### Current list of features:
 * Volume Control
